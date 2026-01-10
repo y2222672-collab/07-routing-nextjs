@@ -40,3 +40,29 @@
 .navigationLink:hover {
   color: #ddd;
 }
+
+.navigation a {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.navigation a:visited {
+  color: inherit;
+}
+.logo {
+  color: white;
+  text-decoration: none;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  transition: opacity 0.2s ease;
+}
+
+.logo:visited {
+  color: white;
+}
+
+.logo:hover {
+  color: #ccc;
+}
