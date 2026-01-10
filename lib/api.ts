@@ -16,10 +16,11 @@ export interface FetchNotesResponse {
 export const fetchNotes = async (
   page = 1,
   perPage = 12,
-  search = ""
+  search = "",
+  tag?: string
 ): Promise<FetchNotesResponse> => {
   const response = await noteApi.get<FetchNotesResponse>("/notes", {
-    params: { page, perPage, search },
+    params: { page, perPage, search, tag },
   });
   return response.data;
 };

@@ -14,15 +14,15 @@ import NoteForm from "@/components/NoteForm/NoteForm";
 import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 import Loader from "@/components/Loader/Loader";
 
-const NotesClient = () => {
+const NotesClient = ({ activeTag }: { activeTag?: string }) => {
   const [search, setSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [debouncedSearch] = useDebounce(search, 500);
 
   const { data, isFetching, isError } = useQuery({
-    queryKey: ["notes", page, 12, debouncedSearch],
-    queryFn: () => fetchNotes(page, 12, debouncedSearch),
+    queryKey: ["notes", page, 12, debouncedSearch, activeTag],
+    queryFn: () => fetchNotes(page, 12, debouncedSearch, activeTag),
     placeholderData: keepPreviousData,
   });
 
@@ -33,23 +33,25 @@ const NotesClient = () => {
 
   return (
     <div className={css.container}>
-      {" "}
       <header className={css.toolbar}>
         <SearchBox value={search} onChange={handleSearch} />
-
         <button className={css.button} onClick={() => setIsModalOpen(true)}>
           Create note +
         </button>
       </header>
+
       {isFetching && !data && (
         <div className={css.loaderContainer}>
           <Loader />
         </div>
       )}
+
       {isError && (
         <ErrorMessage message="Failed to load notes. Check your internet connection." />
       )}
+
       {data && <NoteList notes={data.notes} />}
+
       {data && data.totalPages > 1 && (
         <div className={css.paginationWrapper}>
           <Pagination
@@ -59,6 +61,7 @@ const NotesClient = () => {
           />
         </div>
       )}
+
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
           <NoteForm onCancel={() => setIsModalOpen(false)} />
