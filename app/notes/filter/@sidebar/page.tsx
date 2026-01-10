@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import css from "@/app/@sidebar/SidebarNotes.module.css";
+import css from "./SidebarNotes.module.css";
+
 const TAGS = ["all", "Work", "Personal", "Todo", "Shopping"];
 
-export default function SidebarNotes() {
+export default function SidebarPage() {
   const params = useParams();
   const currentTag = params.slug?.[0] || "all";
 

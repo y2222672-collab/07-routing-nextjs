@@ -22,48 +22,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  sidebar,
   modal,
 }: {
   children: React.ReactNode;
-  sidebar: React.ReactNode;
   modal: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable}`}
         style={{
-          margin: 0,
           height: "100vh",
           display: "flex",
           flexDirection: "column",
+          margin: 0,
         }}
       >
         <TanStackProvider>
           <Header />
-
-          <div
-            className="layout-wrapper"
-            style={{
-              display: "flex",
-              flex: 1,
-              overflow: "hidden",
-            }}
-          >
-            {sidebar}
-            <main
-              style={{
-                flex: 1,
-                overflowY: "auto",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {children}
-            </main>
-          </div>
-
+          {children}
           <Footer />
           {modal}
         </TanStackProvider>
