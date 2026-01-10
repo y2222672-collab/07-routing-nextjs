@@ -1,18 +1,12 @@
 import NotesClient from "../../Notes.client";
 
-export default async function TagPage({
+export default async function Page({
   params,
 }: {
-  params: Promise<{ tag: string[] }>;
+  params: Promise<{ slug: string[] }>;
 }) {
-  const resolvedParams = await params;
+  const { slug } = await params;
+  const activeTag = slug[0] === "all" ? undefined : slug[0];
 
-  const tag = resolvedParams.tag?.[0];
-  const activeFilter = tag === "all" ? undefined : tag;
-
-  return (
-    <main>
-      <NotesClient activeTag={activeFilter} />
-    </main>
-  );
+  return <NotesClient activeTag={activeTag} />;
 }
