@@ -26,7 +26,6 @@ export default function FilteredNotesClient({
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
-  // Логіка перемикання сторінок через URL
   const handlePageChange = (page: number) => {
     const tagPath = activeTag ? activeTag : "all";
     router.push(`/notes/filter/${tagPath}?page=${page}`);
@@ -34,7 +33,6 @@ export default function FilteredNotesClient({
 
   return (
     <div>
-      {/* 1. Рядок пошуку та кнопка створення */}
       <div
         style={{
           display: "flex",
@@ -58,11 +56,8 @@ export default function FilteredNotesClient({
           Create note +
         </button>
       </div>
-
-      {/* 2. Список карток */}
       <NoteList notes={initialNotes} />
 
-      {/* 3. Пагінація */}
       <div
         style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}
       >
@@ -73,7 +68,6 @@ export default function FilteredNotesClient({
         />
       </div>
 
-      {/* 4. Модалка для створення (відкривається при кліку на кнопку) */}
       {isModalOpen && (
         <Modal onClose={() => setModalOpen(false)}>
           <NoteForm onCancel={() => setModalOpen(false)} />
