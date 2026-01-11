@@ -13,7 +13,9 @@ const Header = () => {
             <Link href="/">Home</Link>
           </li>
           <li>
-            <Link href="/notes">Notes</Link>
+            <Link href="/notes/filter/all" aria-label="View all notes">
+              Notes
+            </Link>
           </li>
         </ul>
       </nav>

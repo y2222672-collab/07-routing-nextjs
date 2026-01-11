@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 import { fetchNotes } from "@/lib/api";
-import type { Note, NoteTag } from "@/types/note";
+import { NoteTag } from "@/types/note";
 import css from "../../NotesPage.module.css";
 
 import SearchBox from "@/components/SearchBox/SearchBox";
@@ -16,35 +16,29 @@ import Loader from "@/components/Loader/Loader";
 import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 
 interface NotesClientProps {
-  initialNotes: Note[];
-  totalPages: number;
-  currentPage: number;
   activeTag?: NoteTag;
 }
 
-export default function FilteredNotesClient({
-  initialNotes,
-  totalPages,
-  currentPage: initialPage,
-  activeTag,
-}: NotesClientProps) {
+export default function FilteredNotesClient({ activeTag }: NotesClientProps) {
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(initialPage);
+  const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [debouncedSearch] = useDebounce(search, 500);
 
   const { data, isFetching, isError } = useQuery({
-    queryKey: ["notes", page, 12, debouncedSearch, activeTag],
-    queryFn: () => fetchNotes(page, 12, debouncedSearch, activeTag),
+    queryKey: ["notes", page, activeTag, debouncedSearch],
+    queryFn: () =>
+      fetchNotes({
+        page,
+        tag: activeTag,
+        search: debouncedSearch,
+      }),
     placeholderData: keepPreviousData,
-    initialData:
-      page === initialPage && !debouncedSearch
-        ? { notes: initialNotes, totalPages }
-        : undefined,
+    refetchOnMount: false,
   });
 
-  const handleSearch = (value: string) => {
+  const handleSearchChange = (value: string) => {
     setSearch(value);
     setPage(1);
   };
@@ -52,7 +46,7 @@ export default function FilteredNotesClient({
   return (
     <div className={css.container}>
       <header className={css.toolbar}>
-        <SearchBox value={search} onChange={handleSearch} />
+        <SearchBox value={search} onChange={handleSearchChange} />
         <button className={css.button} onClick={() => setIsModalOpen(true)}>
           Create note +
         </button>
@@ -65,10 +59,14 @@ export default function FilteredNotesClient({
       )}
 
       {isError && (
-        <ErrorMessage message="Failed to load notes. Check your connection." />
+        <ErrorMessage message="Failed to load notes. Please try again." />
       )}
 
-      {data && <NoteList notes={data.notes} />}
+      {data && data.notes.length > 0 ? (
+        <NoteList notes={data.notes} />
+      ) : (
+        !isFetching && <p className={css.empty}>No notes found.</p>
+      )}
 
       {data && data.totalPages > 1 && (
         <div className={css.paginationWrapper}>
@@ -88,16 +86,23 @@ export default function FilteredNotesClient({
     </div>
   );
 }
+
 // "use client";
 
 // import React, { useState } from "react";
+// import { useQuery, keepPreviousData } from "@tanstack/react-query";
+// import { useDebounce } from "use-debounce";
+// import { fetchNotes } from "@/lib/api";
 // import type { Note, NoteTag } from "@/types/note";
-// import NoteList from "@/components/NoteList/NoteList";
+// import css from "../../NotesPage.module.css";
+
 // import SearchBox from "@/components/SearchBox/SearchBox";
+// import NoteList from "@/components/NoteList/NoteList";
 // import Pagination from "@/components/Pagination/Pagination";
 // import Modal from "@/components/Modal/Modal";
 // import NoteForm from "@/components/NoteForm/NoteForm";
-// import { useRouter } from "next/navigation";
+// import Loader from "@/components/Loader/Loader";
+// import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 
 // interface NotesClientProps {
 //   initialNotes: Note[];
@@ -109,58 +114,64 @@ export default function FilteredNotesClient({
 // export default function FilteredNotesClient({
 //   initialNotes,
 //   totalPages,
-//   currentPage,
+//   currentPage: initialPage,
 //   activeTag,
 // }: NotesClientProps) {
-//   const [isModalOpen, setModalOpen] = useState(false);
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const router = useRouter();
+//   const [search, setSearch] = useState("");
+//   const [page, setPage] = useState(initialPage);
+//   const [isModalOpen, setIsModalOpen] = useState(false);
 
-//   const handlePageChange = (page: number) => {
-//     const tagPath = activeTag ? activeTag : "all";
-//     router.push(`/notes/filter/${tagPath}?page=${page}`);
+//   const [debouncedSearch] = useDebounce(search, 500);
+
+//   const { data, isFetching, isError } = useQuery({
+//     queryKey: ["notes", page, 12, debouncedSearch, activeTag],
+//     queryFn: () => fetchNotes(page, 12, debouncedSearch, activeTag),
+//     placeholderData: keepPreviousData,
+//     initialData:
+//       page === initialPage && !debouncedSearch
+//         ? { notes: initialNotes, totalPages }
+//         : undefined,
+//   });
+
+//   const handleSearch = (value: string) => {
+//     setSearch(value);
+//     setPage(1);
 //   };
 
 //   return (
-//     <div>
-//       <div
-//         style={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//           marginBottom: "20px",
-//         }}
-//       >
-//         <SearchBox value={searchQuery} onChange={setSearchQuery} />
-//         <button
-//           onClick={() => setModalOpen(true)}
-//           style={{
-//             backgroundColor: "#007bff",
-//             color: "white",
-//             border: "none",
-//             padding: "10px 20px",
-//             borderRadius: "5px",
-//             cursor: "pointer",
-//           }}
-//         >
+//     <div className={css.container}>
+//       <header className={css.toolbar}>
+//         <SearchBox value={search} onChange={handleSearch} />
+//         <button className={css.button} onClick={() => setIsModalOpen(true)}>
 //           Create note +
 //         </button>
-//       </div>
-//       <NoteList notes={initialNotes} />
+//       </header>
 
-//       <div
-//         style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}
-//       >
-//         <Pagination
-//           totalPages={totalPages}
-//           currentPage={currentPage}
-//           onChange={handlePageChange}
-//         />
-//       </div>
+//       {isFetching && !data && (
+//         <div className={css.loaderContainer}>
+//           <Loader />
+//         </div>
+//       )}
+
+//       {isError && (
+//         <ErrorMessage message="Failed to load notes. Check your connection." />
+//       )}
+
+//       {data && <NoteList notes={data.notes} />}
+
+//       {data && data.totalPages > 1 && (
+//         <div className={css.paginationWrapper}>
+//           <Pagination
+//             totalPages={data.totalPages}
+//             currentPage={page}
+//             onChange={(newPage) => setPage(newPage)}
+//           />
+//         </div>
+//       )}
 
 //       {isModalOpen && (
-//         <Modal onClose={() => setModalOpen(false)}>
-//           <NoteForm onCancel={() => setModalOpen(false)} />
+//         <Modal onClose={() => setIsModalOpen(false)}>
+//           <NoteForm onCancel={() => setIsModalOpen(false)} />
 //         </Modal>
 //       )}
 //     </div>
