@@ -2,14 +2,13 @@ import React from "react";
 import Link from "next/link";
 import { NoteTag } from "@/types/note";
 import css from "./Sidebar.module.css";
-
 const NAV_ITEMS: { label: string; value: NoteTag | "all" }[] = [
   { label: "All notes", value: "all" },
-  { label: "Todo", value: "todo" },
-  { label: "Work", value: "work" },
-  { label: "Personal", value: "personal" },
-  { label: "Meeting", value: "meeting" },
-  { label: "Shopping", value: "shopping" },
+  { label: "Todo", value: "Todo" },
+  { label: "Work", value: "Work" },
+  { label: "Personal", value: "Personal" },
+  { label: "Meeting", value: "Meeting" },
+  { label: "Shopping", value: "Shopping" },
 ];
 
 export default function SidebarDefault() {
