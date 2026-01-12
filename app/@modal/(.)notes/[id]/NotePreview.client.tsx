@@ -4,30 +4,48 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { fetchNoteById } from "@/lib/api";
 import Modal from "@/components/Modal/Modal";
+import Loader from "@/components/Loader/Loader";
+import ErrorMessage from "@/components/ErrorMessage/ErrorMessage";
 import css from "./NotePreview.module.css";
 
 export default function NotePreviewClient({ id }: { id: string }) {
   const router = useRouter();
 
-  const { data: note, isLoading } = useQuery({
+  const {
+    data: note,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
     refetchOnMount: false,
   });
 
-  if (isLoading) return null;
-
   return (
     <Modal onClose={() => router.back()}>
       <div className={css.previewContainer}>
-        {note ? (
+        {isLoading && (
+          <div className={css.center}>
+            <Loader />
+          </div>
+        )}
+
+        {isError && (
+          <ErrorMessage message="Failed to load note details. Please try again later." />
+        )}
+
+        {!isLoading && !isError && note && (
           <>
             <h2 className={css.title}>{note.title}</h2>
-            <span className={css.tag}>{note.tag}</span>
+            <div className={css.meta}>
+              <span className={css.tag}>{note.tag}</span>
+            </div>
             <p className={css.content}>{note.content}</p>
           </>
-        ) : (
-          <p>Note not found</p>
+        )}
+
+        {!isLoading && !isError && !note && (
+          <p className={css.empty}>Note not found.</p>
         )}
       </div>
     </Modal>
@@ -35,34 +53,35 @@ export default function NotePreviewClient({ id }: { id: string }) {
 }
 // "use client";
 
-// import React from "react";
+// import { useQuery } from "@tanstack/react-query";
 // import { useRouter } from "next/navigation";
+// import { fetchNoteById } from "@/lib/api";
 // import Modal from "@/components/Modal/Modal";
-// import type { Note } from "@/types/note";
 // import css from "./NotePreview.module.css";
 
-// interface NotePreviewClientProps {
-//   note: Note;
-// }
-
-// export default function NotePreviewClient({ note }: NotePreviewClientProps) {
+// export default function NotePreviewClient({ id }: { id: string }) {
 //   const router = useRouter();
+
+//   const { data: note, isLoading } = useQuery({
+//     queryKey: ["note", id],
+//     queryFn: () => fetchNoteById(id),
+//     refetchOnMount: false,
+//   });
+
+//   if (isLoading) return null;
 
 //   return (
 //     <Modal onClose={() => router.back()}>
-//       <div className={css.container}>
-//         <div className={css.item}>
-//           <header className={css.header}>
-//             <h2>{note.title}</h2>
+//       <div className={css.previewContainer}>
+//         {note ? (
+//           <>
+//             <h2 className={css.title}>{note.title}</h2>
 //             <span className={css.tag}>{note.tag}</span>
-//           </header>
-
-//           <div className={css.content}>{note.content}</div>
-
-//           <button className={css.backBtn} onClick={() => router.back()}>
-//             Close Preview
-//           </button>
-//         </div>
+//             <p className={css.content}>{note.content}</p>
+//           </>
+//         ) : (
+//           <p>Note not found</p>
+//         )}
 //       </div>
 //     </Modal>
 //   );
